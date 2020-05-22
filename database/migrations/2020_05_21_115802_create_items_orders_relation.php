@@ -18,6 +18,7 @@ class CreateItemsOrdersRelation extends Migration
             $table->foreignId('item_id')->constrained();
             $table->foreignId('order_id')->constrained();
             $table->unsignedInteger('quantity');
+            $table->double('item_price');
         });
     }
 

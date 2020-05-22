@@ -10,6 +10,6 @@ class Item extends Model
 
     public function orders() 
     {
-        return $this->belongsToMany('App\Order')->withPivot('quantity');
+        return $this->belongsToMany('App\Order')->withPivot('quantity', 'item_price');
     }
 }
