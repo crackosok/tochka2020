@@ -6,6 +6,7 @@ use App\Item;
 use App\Order;
 use App\Services\NotificationService;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class OrderService 
 {
@@ -13,7 +14,7 @@ class OrderService
     {
         $this->notificationService = $notificationService;
     }
-    
+
     public function makeOrder($validated) 
     {
         $order = Order::create(Arr::except($validated, ['items']));
@@ -30,11 +31,13 @@ class OrderService
             } else {
                 $order->items()->delete();
                 $order->delete();
+                Log::error('Attempt to order more items than there are in stock');
                 return null;
             }
         }
         $order->price = $orderPrice;
         $order->save();
+        Log::info("Order $order->id successfully created");
 
         $this->notificationService->newOrder($order);
         $this->postOrderIntegrations();
