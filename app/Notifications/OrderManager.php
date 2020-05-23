@@ -11,6 +11,8 @@ class OrderManager extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected $orderPrice;
+
     /**
      * Create a new notification instance.
      *

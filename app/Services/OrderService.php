@@ -3,26 +3,47 @@
 namespace App\Services;
 
 use App\Item;
-use App\Notifications\OrderClient;
-use App\Notifications\OrderManager;
 use App\Order;
-use Illuminate\Support\Facades\Notification;
+use App\Services\NotificationService;
+use Illuminate\Support\Arr;
 
-class OrderService {
-    public static function makeOrder($request) {
-        $order = Order::create($request->except('items'));
-        $orderItems = $request->items;
+class OrderService 
+{
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+    
+    public function makeOrder($validated) 
+    {
+        $order = Order::create(Arr::except($validated, ['items']));
+
+        $orderItems = $validated['items'];
         $orderPrice = 0.0;
         foreach($orderItems as $orderItem) { 
             $order->items()->attach($orderItem['item_id'], ['quantity' => $orderItem['quantity'], 'item_price' => $orderItem['price']]);
             $item = Item::find($orderItem['item_id']);
-            $item->stock -= $orderItem['quantity'];
-            $item->save();
-            $orderPrice += $item->price * $orderItem['quantity'];
+            if ($orderItem['quantity'] < $item->stock) {
+                $item->stock -= $orderItem['quantity'];
+                $item->save();
+                $orderPrice += $item->price * $orderItem['quantity'];
+            } else {
+                $order->items()->delete();
+                $order->delete();
+                return null;
+            }
         }
         $order->price = $orderPrice;
         $order->save();
-        Notification::route('mail', $request->client_email)->notify(new OrderClient($orderPrice));
-        Notification::route('mail', config('notifications.email.managers'))->notify(new OrderManager($orderPrice));
+
+        $this->notificationService->newOrder($order);
+        $this->postOrderIntegrations();
+
+        return $order->id;
+    }
+
+    public function postOrderIntegrations() 
+    {
+        // send to delivery service, crm, etc
     }
 }

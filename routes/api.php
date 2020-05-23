@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/items', 'ApiController@getItems');
-Route::get('/items/{item_id}', 'ApiController@getItem');
-Route::post('/orders', 'ApiController@makeOrder');
+Route::get('/items', 'ItemController@index');
+Route::get('/items/{item_id}', 'ItemController@show');
+Route::post('/orders', 'OrderController@create');

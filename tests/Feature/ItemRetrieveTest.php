@@ -20,7 +20,7 @@ class ItemRetrieveTest extends TestCase
 
         $this->get('/api/items')
             ->assertStatus(200)
-            ->assertJson($items->where('stock', '>', 0)->toArray());
+            ->assertJson(['success' => true, 'data' => $items->where('stock', '>', 0)->toArray()]);
     }
 
     /**
@@ -34,6 +34,6 @@ class ItemRetrieveTest extends TestCase
         
         $this->get("/api/items/{$item->id}")
             ->assertStatus(200)
-            ->assertJson($item->toArray());
+            ->assertJson(['success' => true, 'data' => $item->toArray()]);
     }
 }
