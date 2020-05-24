@@ -1,79 +1,98 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+## API Интернет-магазина
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+### Развертывание
+.env.example переименовать в .env (уже включил туда нужные доступы к БД докера для ускорения процесса)
 
-## About Laravel
+#### Сборка и запуск Docker
+`docker-compose build app`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+`docker-compose up -d`
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+#### Стандартные процедуры для запуска laravel-приложения
+`docker-compose exec app composer install`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+`docker-compose exec app php artisan migrate --seed`
 
-## Learning Laravel
+Сидер создает 30 случайных продуктов в базе, сама база создается при запуске Docker через initdb
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Описание методов
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Получение списка товаров
 
-## Laravel Sponsors
+`GET /api/items`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+* Входные данные отсутствуют
+* Выходные данные: список товаров, оставшихся на складе либо сообщение об отсутствии таких с кодом 404
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-- [Appoly](https://www.appoly.co.uk)
-- [OP.GG](https://op.gg)
-- [云软科技](http://www.yunruan.ltd/)
+#### Получение информации о товаре
 
-## Contributing
+`GET /api/items/{item_id}`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* Входные данные: ID товара в URL
+* Выходные данные: информация о найденном товаре либо сообщение об отсутствии такого с кодом 404
 
-## Code of Conduct
+#### Совершение заказа
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+`POST /api/items`
 
-## Security Vulnerabilities
+* Входные данные: данные о клиенте (имя, почта, телефон), данные о товарах в заказе (ID, количество, текущая цена)
+* Выходные данные: ID совершенного заказа либо сообщение об ошибке
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+##### Пример входных данных
+```json
+    {
+        'customer_name': 'Vasya',
+        'customer_email': 'vasya@pupkin.ru',
+        'customer_phone': '78005553535',
+        'items': [
+            {'item_id': 1, 'quantity': 2, 'price': 100},
+            {'item_id': 2, 'quantity': 1, 'price': 200},
+            {'item_id': 3, 'quantity': 3, 'price': 300},
+        ]
+    }
+```
 
-## License
+### Ежедневный отчет
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Отправляется стандартным task scheduler в Laravel, для работы нужно добавить его в крон
+
+`* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1`
+
+
+### Тесты
+Для методов API написаны тесты, проверяющие основной функционал
+
+`php artisan test`
+
+### Общий формат выходных данных
+API отдает JSON, первое поле в котором `success` - `true` или `false` в зависимости от успешности запроса.
+
+При успешном запросе вторым полем будет `data`, которое будет содержать сами выходные данные метода.
+
+При ошибке вторым полем будет `error`, которое будет содержать код и сообщение ошибки.
+
+#### Пример ответа на успешный запрос
+
+```json
+{
+    'success': true,
+    'data': {
+        'order_id': 1
+    }
+}
+```
+
+#### Пример ответа на неудачный запрос
+
+```json
+{
+    'success': false,
+    'error': {
+        'code': 404,
+        'message': 'No item found with that ID'
+    }
+}
+```
+
+### Не реализовано
+Учитывание одновременного заказа последнего товара несколькими клиентами - просто не додумался, как быть в такой ситуации
