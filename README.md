@@ -41,13 +41,13 @@
 ##### Пример входных данных
 ```json
     {
-        'customer_name': 'Vasya',
-        'customer_email': 'vasya@pupkin.ru',
-        'customer_phone': '78005553535',
-        'items': [
-            {'item_id': 1, 'quantity': 2, 'price': 100},
-            {'item_id': 2, 'quantity': 1, 'price': 200},
-            {'item_id': 3, 'quantity': 3, 'price': 300},
+        "customer_name": "Vasya",
+        "customer_email": "vasya@pupkin.ru",
+        "customer_phone": "78005553535",
+        "items": [
+            {"item_id": 1, "quantity": 2, "price": 100},
+            {"item_id": 2, "quantity": 1, "price": 200},
+            {"item_id": 3, "quantity": 3, "price": 300},
         ]
     }
 ```
@@ -75,9 +75,9 @@ API отдает JSON, первое поле в котором `success` - `true
 
 ```json
 {
-    'success': true,
-    'data': {
-        'order_id': 1
+    "success": true,
+    "data": {
+        "order_id": 1
     }
 }
 ```
@@ -86,10 +86,10 @@ API отдает JSON, первое поле в котором `success` - `true
 
 ```json
 {
-    'success': false,
-    'error': {
-        'code': 404,
-        'message': 'No item found with that ID'
+    "success": false,
+    "error": {
+        "code": 404,
+        "message": "No item found with that ID"
     }
 }
 ```
